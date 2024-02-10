@@ -5,6 +5,8 @@ import { Post, crawl } from './crawler.ts';
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
 });
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 app();
 
@@ -28,5 +30,25 @@ async function app() {
         newPosts.unshift(post);
       }
     });
+
+    if (newPosts.length > 0) {
+      for (const post of newPosts) {
+        const text = encodeURIComponent(`${post.title}\n${post.link}`);
+        await fetch(
+          `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`
+        );
+      }
+
+      const newPostsVolumeno = newPosts.map((post) => post.volumeno).join('\n');
+      await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+        owner: 'eenaree',
+        repo: 'keyeast-post-bot',
+        issue_number: 1,
+        body: `${data.body}\n${newPostsVolumeno}`,
+        headers: {
+          'X-Github-Api-Version': '2022-11-28',
+        },
+      });
+    }
   }
 }
