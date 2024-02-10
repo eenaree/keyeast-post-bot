@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
 
-type Post = {
+export type Post = {
   title: string;
   link: string;
   volumeno: number;
