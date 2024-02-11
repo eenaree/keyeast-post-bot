@@ -16,9 +16,6 @@ async function app() {
     owner: 'eenaree',
     repo: 'keyeast-post-bot',
     issue_number: 1,
-    headers: {
-      'X-Github-Api-Version': '2022-11-28',
-    },
   });
   const newPosts: Post[] = [];
 
@@ -45,9 +42,6 @@ async function app() {
         repo: 'keyeast-post-bot',
         issue_number: 1,
         body: `${data.body}\n${newPostsVolumeno}`,
-        headers: {
-          'X-Github-Api-Version': '2022-11-28',
-        },
       });
     }
   }
