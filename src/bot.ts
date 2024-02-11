@@ -1,10 +1,7 @@
 import 'dotenv/config.js';
-import { Octokit } from 'octokit';
 import { Post, crawl } from './crawler.ts';
+import { getIssue, updateIssue } from './api/issue.ts';
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_ACCESS_TOKEN,
-});
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -12,15 +9,11 @@ app();
 
 async function app() {
   const postsFromCrawling = await crawl();
-  const { data } = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
-    owner: 'eenaree',
-    repo: 'keyeast-post-bot',
-    issue_number: 1,
-  });
+  const issue = await getIssue({ owner: 'eenaree', repo: 'keyeast-post-bot', issue_number: 1 });
   const newPosts: Post[] = [];
 
-  if (data.body) {
-    const volumenoList = data.body.split('\n');
+  if (issue && issue.data?.body) {
+    const volumenoList = issue.data.body.split('\n');
     const lastVolumeno = volumenoList[volumenoList.length - 1];
     postsFromCrawling.forEach((post) => {
       if (+lastVolumeno < +post.volumeno) {
@@ -37,11 +30,11 @@ async function app() {
       }
 
       const newPostsVolumeno = newPosts.map((post) => post.volumeno).join('\n');
-      await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+      await updateIssue({
         owner: 'eenaree',
         repo: 'keyeast-post-bot',
         issue_number: 1,
-        body: `${data.body}\n${newPostsVolumeno}`,
+        body: `${issue.data.body}\n${newPostsVolumeno}`,
       });
     }
   }
