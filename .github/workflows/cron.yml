@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Change home directory for browser caching
+        run: node node_modules/puppeteer/install.js
+
       - name: Run start script
         env:
           OCTOKIT_TOKEN: ${{ secrets.OCTOKIT_TOKEN }}
