@@ -24,13 +24,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Change home directory for browser caching
-        run: node node_modules/puppeteer/install.js
 
       - name: Run start script
         env:
