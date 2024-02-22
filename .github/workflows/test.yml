@@ -25,6 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
 
       - name: Run start script
         env:
