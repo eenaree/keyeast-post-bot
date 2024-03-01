@@ -1,5 +1,5 @@
 import 'dotenv/config.js';
-import { Post, crawl } from './crawler.ts';
+import { Posts, crawl } from './crawler.ts';
 import { getIssue, updateIssue } from './api/issue.ts';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -15,10 +15,10 @@ async function app() {
     const lastVolumeno = getLastVolumeno(issue.data.body);
     const newPosts = getNewPosts(postsFromCrawling, lastVolumeno);
 
-    if (newPosts.length > 0) {
+    if (newPosts.size > 0) {
       await sendNotification(newPosts);
 
-      const newPostsVolumeno = newPosts.map((post) => post.volumeno).join('\n');
+      const newPostsVolumeno = [...newPosts].map(([volumeno, value]) => volumeno).join('\n');
       await updateIssue({
         owner: 'eenaree',
         repo: 'keyeast-post-bot',
@@ -34,21 +34,23 @@ function getLastVolumeno(data: string) {
   return +volumenoList[volumenoList.length - 1];
 }
 
-function getNewPosts(posts: Post[], lastVolumeno: number) {
-  const newPosts: Post[] = [];
-  posts.forEach((post) => {
-    if (lastVolumeno < post.volumeno) {
-      newPosts.unshift(post);
+function getNewPosts(posts: Posts, lastVolumeno: number) {
+  const keyAscPostsArray = [...posts].sort();
+  const keyAscPostsMap = new Map(keyAscPostsArray);
+  const newPosts: Posts = new Map();
+  keyAscPostsMap.forEach((value, volumeno) => {
+    if (lastVolumeno < volumeno) {
+      newPosts.set(volumeno, value);
     }
   });
 
   return newPosts;
 }
 
-async function sendNotification(posts: Post[]) {
+async function sendNotification(posts: Posts) {
   try {
-    for (const post of posts) {
-      const text = encodeURIComponent(`${post.title}\n${post.link}`);
+    for (const [volumeno, { title, link }] of posts) {
+      const text = encodeURIComponent(`${title}\n${link}`);
       await fetch(
         `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`
       );

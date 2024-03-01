@@ -1,11 +1,7 @@
 import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
 
-export type Post = {
-  title: string;
-  link: string;
-  volumeno: number;
-};
+export type Posts = Map<number, { title: string; link: string }>;
 
 function getPageUrl(keyword: string) {
   return `https://post.naver.com/search/authorPost.naver?keyword=${encodeURIComponent(
@@ -16,7 +12,7 @@ function getPageUrl(keyword: string) {
 export async function crawl() {
   const browser = await puppeteer.launch();
   const page1 = await browser.newPage();
-  const posts: Post[] = [];
+  const posts: Posts = new Map();
 
   try {
     await page1.goto(getPageUrl('문가영'));
@@ -38,7 +34,7 @@ export async function crawl() {
           let href = $(elem).find('a.link_end').attr('href');
           if (href) {
             href = href.slice(0, href.indexOf('&searchKeyword'));
-            posts.push({ volumeno, title, link: 'https://post.naver.com' + href });
+            posts.set(volumeno, { title, link: 'https://post.naver.com' + href });
           }
         }
       }
@@ -52,7 +48,7 @@ export async function crawl() {
   const page2 = await browser.newPage();
 
   try {
-    await page2.goto(getPageUrl('가영'));
+    await page2.goto(getPageUrl('문가영 광고'));
     await page2.setViewport({ width: 1920, height: 1080 });
   } catch (error) {
     throw new Error('failed to load the page2');
@@ -71,7 +67,7 @@ export async function crawl() {
           let href = $(elem).find('a.link_end').attr('href');
           if (href) {
             href = href.slice(0, href.indexOf('&searchKeyword'));
-            posts.push({ volumeno, title, link: 'https://post.naver.com' + href });
+            posts.set(volumeno, { title, link: 'https://post.naver.com' + href });
           }
         }
       }
