@@ -31,13 +31,13 @@ async function app() {
 
 function getLastVolumeno(data: string) {
   const volumenoList = data.split('\n');
-  return volumenoList[volumenoList.length - 1];
+  return +volumenoList[volumenoList.length - 1];
 }
 
-function getNewPosts(posts: Post[], lastVolumeno: string) {
+function getNewPosts(posts: Post[], lastVolumeno: number) {
   const newPosts: Post[] = [];
   posts.forEach((post) => {
-    if (+lastVolumeno < +post.volumeno) {
+    if (lastVolumeno < post.volumeno) {
       newPosts.unshift(post);
     }
   });
