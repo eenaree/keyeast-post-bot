@@ -30,6 +30,7 @@ export async function crawl() {
     const $ = cheerio.load(content);
     const feedElems = $('ul.lst_feed').children();
     feedElems.each((i, elem) => {
+      if (i > 4) return;
       for (const attr of elem.attributes) {
         if (attr.name === 'volumeno') {
           const volumeno = +attr.value;
@@ -62,6 +63,7 @@ export async function crawl() {
     const $ = cheerio.load(content);
     const feedElems = $('ul.lst_feed').children();
     feedElems.each((i, elem) => {
+      if (i > 4) return;
       for (const attr of elem.attributes) {
         if (attr.name === 'volumeno') {
           const volumeno = +attr.value;
