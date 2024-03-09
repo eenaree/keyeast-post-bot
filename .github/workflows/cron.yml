@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install puppeteer with Chrome
+        run: pnpm puppeteer browsers install chrome
+
       - name: Run start script
         env:
           OCTOKIT_TOKEN: ${{ secrets.OCTOKIT_TOKEN }}
