@@ -17,7 +17,8 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
-          run_install: false
+          run_install: |
+            - args: [typescript, ts-node, '@types/node', dotenv, octokit]
 
       - name: Get pnpm store directory
         shell: bash
@@ -31,15 +32,3 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - run: pnpm puppeteer browsers install chrome
-
-      - name: Run start script
-        env:
-          OCTOKIT_TOKEN: ${{ secrets.OCTOKIT_TOKEN }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: pnpm run start
