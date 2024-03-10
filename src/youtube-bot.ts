@@ -1,5 +1,5 @@
 import { CHAT_ID } from './api/index.ts';
-import { getIssue } from './api/issue.ts';
+import { getIssue, updateIssue } from './api/issue.ts';
 import { sendMessage } from './api/telegram.ts';
 import { ActivityResource, VideoResource } from './api/type.ts';
 import { fetchActivityResource, fetchVideoResource } from './api/youtube.ts';
@@ -15,6 +15,9 @@ app();
 async function app() {
   const recentYoutubeActivity = await getRecentYoutubeActivity();
   if (recentYoutubeActivity) {
+    const mostRecentActivityResource = recentYoutubeActivity[0];
+    await updateYoutubeIssue(mostRecentActivityResource);
+
     const recentKayoungRelatedUploadActivity = await filterKayoungRelatedUploadActivity(
       recentYoutubeActivity
     );
@@ -23,6 +26,19 @@ async function app() {
       notifyKayoungUploads(recentKayoungRelatedUploadActivity);
     }
   }
+}
+
+async function updateYoutubeIssue(activity: ActivityResource) {
+  await updateIssue({
+    owner: 'eenaree',
+    repo: 'keyeast-post-bot',
+    issue_number: 5,
+    body: JSON.stringify({
+      id: activity.id,
+      type: activity.snippet.type,
+      publishedAt: activity.snippet.publishedAt,
+    }),
+  });
 }
 
 async function notifyKayoungUploads(recentKayoungRelatedUploadActivities: ActivityResource[]) {
