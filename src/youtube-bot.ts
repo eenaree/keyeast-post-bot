@@ -1,4 +1,6 @@
+import { CHAT_ID } from './api/index.ts';
 import { getIssue } from './api/issue.ts';
+import { sendMessage } from './api/telegram.ts';
 import { ActivityResource, VideoResource } from './api/type.ts';
 import { fetchActivityResource, fetchVideoResource } from './api/youtube.ts';
 
@@ -16,6 +18,20 @@ async function app() {
     const recentKayoungRelatedUploadActivity = await filterKayoungRelatedUploadActivity(
       recentYoutubeActivity
     );
+
+    if (recentKayoungRelatedUploadActivity) {
+      notifyKayoungUploads(recentKayoungRelatedUploadActivity);
+    }
+  }
+}
+
+async function notifyKayoungUploads(recentKayoungRelatedUploadActivities: ActivityResource[]) {
+  for (const activity of recentKayoungRelatedUploadActivities) {
+    const videoId = activity.contentDetails.upload?.videoId;
+    if (videoId) {
+      const youtubeLink = `youtu.be/${videoId}`;
+      await sendMessage(CHAT_ID, youtubeLink);
+    }
   }
 }
 
