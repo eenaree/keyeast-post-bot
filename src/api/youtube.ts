@@ -1,5 +1,5 @@
 import { YOUTUBE_API_KEY } from './index.ts';
-import { ActivityResource } from './type.ts';
+import { ActivityResource, VideoResource } from './type.ts';
 
 export async function fetchActivityResource({
   channelId,
@@ -37,6 +37,32 @@ export async function fetchActivityResource({
     return null;
   } catch (error) {
     throw new Error("failed to fetch channel's activity");
+  }
+}
+
+export async function fetchVideoResource(videoId: string) {
+  try {
+    const params = {
+      part: 'snippet,contentDetails',
+      fields:
+        'items(id,snippet(publishedAt,title,description,thumbnails,tags),contentDetails(duration))',
+      id: videoId,
+      key: YOUTUBE_API_KEY,
+    };
+
+    const queryString = Object.entries(params)
+      .filter(([key, value]) => value !== undefined)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${queryString}`);
+    const data = await response.json();
+    if (isListResponseType<VideoResource>(data)) {
+      return data.items;
+    }
+    return null;
+  } catch (error) {
+    throw new Error('failed to fetch video info');
   }
 }
 

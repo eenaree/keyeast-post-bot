@@ -1,6 +1,6 @@
 import { getIssue } from './api/issue.ts';
-import { ActivityResource } from './api/type.ts';
-import { fetchActivityResource } from './api/youtube.ts';
+import { ActivityResource, VideoResource } from './api/type.ts';
+import { fetchActivityResource, fetchVideoResource } from './api/youtube.ts';
 
 type ActivityData = {
   id: string;
@@ -12,7 +12,54 @@ app();
 
 async function app() {
   const recentYoutubeActivity = await getRecentYoutubeActivity();
-  console.log(recentYoutubeActivity);
+  if (recentYoutubeActivity) {
+    const recentKayoungRelatedUploadActivity = await filterKayoungRelatedUploadActivity(
+      recentYoutubeActivity
+    );
+  }
+}
+
+async function filterKayoungRelatedUploadActivity(activity: ActivityResource[]) {
+  const uploadActivity = filterUploadActivity(activity);
+  const kayoungRelatedUploadActivity: ActivityResource[] = [];
+
+  for (const activity of uploadActivity) {
+    if (activity.contentDetails.upload) {
+      const videoId = activity.contentDetails.upload.videoId;
+      const video = await fetchVideoResource(videoId);
+      if (video) {
+        const { title, description, tags } = getVideoDetails(video[0]);
+        const hasKayoungKeyword =
+          containsKayoungKeyword(title) ||
+          containsKayoungKeyword(description) ||
+          tags.some((tag) => containsKayoungKeyword(tag));
+        if (hasKayoungKeyword) {
+          kayoungRelatedUploadActivity.unshift(activity);
+        }
+      }
+    }
+  }
+
+  return kayoungRelatedUploadActivity;
+}
+
+function filterUploadActivity(activity: ActivityResource[]) {
+  return activity.filter((activity) => activity.snippet.type === 'upload');
+}
+
+function getVideoDetails(video: VideoResource) {
+  const { title, description, thumbnails, tags } = video.snippet;
+  return {
+    title,
+    description,
+    thumbnails,
+    tags,
+  };
+}
+
+function containsKayoungKeyword(str: string) {
+  const keywords = ['문가영', '가영', 'munkayoung', 'mun ka young'];
+  return keywords.some((keyword) => str.includes(keyword));
 }
 
 async function getRecentYoutubeActivity() {

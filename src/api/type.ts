@@ -28,3 +28,23 @@ export type ActivityResource = {
     };
   };
 };
+
+export type VideoResource = {
+  id: string;
+  snippet: {
+    publishedAt: string;
+    title: string;
+    description: string;
+    thumbnails: {
+      [size in ThumbnailSize]: {
+        url: string;
+        width: number;
+        height: number;
+      };
+    };
+    tags: string[];
+  };
+  contentDetails: {
+    duration: string;
+  };
+};
