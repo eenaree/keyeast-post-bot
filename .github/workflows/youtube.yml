@@ -33,6 +33,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Run start script
         env:
           OCTOKIT_TOKEN: ${{ secrets.OCTOKIT_TOKEN }}
