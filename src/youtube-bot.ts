@@ -14,7 +14,7 @@ app();
 
 async function app() {
   const recentYoutubeActivity = await getRecentYoutubeActivity();
-  if (recentYoutubeActivity) {
+  if (recentYoutubeActivity && recentYoutubeActivity.length > 0) {
     const mostRecentActivityResource = recentYoutubeActivity[0];
     await updateYoutubeIssue(mostRecentActivityResource);
 
