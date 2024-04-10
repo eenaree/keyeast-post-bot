@@ -5,7 +5,8 @@ name: Youtube
 
 on:
   schedule:
-    - cron: '0/5 0-14 * * *'
+    - cron: '10,20,30,40,50 0-12 * * *'
+    - cron: '45 13 * * *'
 
 jobs:
   cron:
