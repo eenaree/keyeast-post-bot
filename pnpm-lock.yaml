@@ -10,11 +10,18 @@ dependencies:
     version: 1.0.0-rc.12
 
 devDependencies:
+  '@types/google-apps-script':
+    specifier: ^1.0.83
+    version: 1.0.83
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
 
 packages:
+
+  /@types/google-apps-script@1.0.83:
+    resolution: {integrity: sha512-o+QNeNZxPAfYHzRiLHjub9qF0IILg21r9MzYlnrIHUT+/wcC70aqDfedmzKTgtzsj79zvoTZD0cjGgy46+1Ynw==}
+    dev: true
 
   /boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
